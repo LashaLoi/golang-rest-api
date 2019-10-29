@@ -13,6 +13,8 @@ func main() {
 
 	r := router.ConfigureRouter(c.Users)
 
-	log.Println("Server was started on", c.Port)
-	http.ListenAndServe(c.Port, r)
+	log.Printf("Server was started on %v", c.Port)
+	if err := http.ListenAndServe(c.Port, r); err != nil {
+		log.Fatal(err)
+	}
 }

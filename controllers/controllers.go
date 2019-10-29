@@ -29,7 +29,10 @@ func CreateUser(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user customtypes.User
 
-		_ = json.NewDecoder(r.Body).Decode(&user)
+		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+			log.Fatal(err)
+		}
+		defer r.Body.Close()
 
 		user.ID = rand.Intn(1000000)
 		*users = append(*users, user)
@@ -82,8 +85,8 @@ func DeleteUser(users *[]customtypes.User) http.HandlerFunc {
 				*users = append((*users)[:i], (*users)[i+1:]...)
 
 				json.NewEncoder(w).Encode(customtypes.Success{
-					Code: 200,
-					Ok:   true,
+					Code:    200,
+					Message: "User was successfully deleted",
 				})
 
 				return

@@ -16,6 +16,6 @@ type NotFoundError struct {
 
 // Success ...
 type Success struct {
-	Code int  `json:"code"`
-	Ok   bool `json:"ok"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
