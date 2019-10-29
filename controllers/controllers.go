@@ -20,23 +20,19 @@ func Info(w http.ResponseWriter, r *http.Request) {
 // GetUsers ...
 func GetUsers(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		json.NewEncoder(w).Encode(*users)
 	}
 }
 
 // CreateUser ...
-func CreateUser(users []customtypes.User, userspointer *[]customtypes.User) http.HandlerFunc {
+func CreateUser(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		var user customtypes.User
 
 		_ = json.NewDecoder(r.Body).Decode(&user)
 
 		user.ID = rand.Intn(1000000)
-		users = append(users, user)
-
-		*userspointer = users
+		*users = append(*users, user)
 
 		json.NewEncoder(w).Encode(user)
 	}
@@ -70,7 +66,7 @@ func GetUser(users *[]customtypes.User) http.HandlerFunc {
 }
 
 // DeleteUser ...
-func DeleteUser(users []customtypes.User, userspointer *[]customtypes.User) http.HandlerFunc {
+func DeleteUser(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 
@@ -80,12 +76,10 @@ func DeleteUser(users []customtypes.User, userspointer *[]customtypes.User) http
 			log.Fatal(err)
 		}
 
-		for i, item := range users {
+		for i, item := range *users {
 			if id == item.ID {
 
-				users = append(users[:i], users[i+1:]...)
-
-				*userspointer = users
+				*users = append((*users)[:i], (*users)[i+1:]...)
 
 				json.NewEncoder(w).Encode(customtypes.Success{
 					Code: 200,
