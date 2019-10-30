@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
 
 	"../customtypes"
+	"../validation"
 	"github.com/gorilla/mux"
 )
 
@@ -19,7 +19,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 // UsersGet ...
 func UsersGet(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(*users)
+		if err := json.NewEncoder(w).Encode(*users); err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		}
 	}
 }
 
@@ -29,14 +31,22 @@ func UserCreate(users *[]customtypes.User) http.HandlerFunc {
 		var user customtypes.User
 
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-			log.Fatal(err)
+			http.Error(w, err.Error(), http.StatusExpectationFailed)
+			return
 		}
 		defer r.Body.Close()
+
+		if err := validation.UserValidation(user); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 		user.ID = rand.Intn(1000000)
 		*users = append(*users, user)
 
-		json.NewEncoder(w).Encode(user)
+		if err := json.NewEncoder(w).Encode(user); err != nil {
+			http.Error(w, err.Error(), http.StatusExpectationFailed)
+		}
 	}
 }
 
@@ -46,24 +56,29 @@ func UserGet(users *[]customtypes.User) http.HandlerFunc {
 		params := mux.Vars(r)
 
 		id, err := strconv.Atoi(params["id"])
-
 		if err != nil {
-			log.Fatal(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
 
 		for _, item := range *users {
 			if id == item.ID {
-
-				json.NewEncoder(w).Encode(item)
+				if err := json.NewEncoder(w).Encode(item); err != nil {
+					http.Error(w, err.Error(), http.StatusBadRequest)
+				}
 
 				return
 			}
 		}
 
-		json.NewEncoder(w).Encode(customtypes.NotFoundError{
+		notFount := customtypes.NotFoundError{
 			Code:    404,
 			Message: "Element with this id is not found",
-		})
+		}
+
+		if err := json.NewEncoder(w).Encode(notFount); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 	}
 }
 
@@ -73,28 +88,35 @@ func UserDelete(users *[]customtypes.User) http.HandlerFunc {
 		params := mux.Vars(r)
 
 		id, err := strconv.Atoi(params["id"])
-
 		if err != nil {
-			log.Fatal(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
 		}
 
 		for i, item := range *users {
 			if id == item.ID {
-
 				*users = append((*users)[:i], (*users)[i+1:]...)
 
-				json.NewEncoder(w).Encode(customtypes.Success{
+				success := customtypes.Success{
 					Code:    200,
 					Message: "User was successfully deleted",
-				})
+				}
+
+				if err := json.NewEncoder(w).Encode(success); err != nil {
+					http.Error(w, err.Error(), http.StatusBadRequest)
+				}
 
 				return
 			}
 		}
 
-		json.NewEncoder(w).Encode(customtypes.NotFoundError{
+		notFount := customtypes.NotFoundError{
 			Code:    404,
 			Message: "Element with this id is not found",
-		})
+		}
+
+		if err := json.NewEncoder(w).Encode(notFount); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 	}
 }
