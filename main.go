@@ -2,19 +2,22 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"./config"
 	"./router"
+	"./server"
 )
 
 func main() {
 	c := config.NewConfig()
-
 	r := router.ConfigureRouter(c.Users)
 
-	log.Printf("Server was started on %v", c.Port)
-	if err := http.ListenAndServe(c.Port, r); err != nil {
+	s := server.Server{
+		Port:   c.Port,
+		Router: r,
+	}
+
+	if err := s.NewServer(); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -1,8 +1,6 @@
 package config
 
-import (
-	"../customtypes"
-)
+import "../customtypes"
 
 // Config ...
 type Config struct {
@@ -12,22 +10,24 @@ type Config struct {
 
 // NewConfig ..
 func NewConfig() Config {
-	config := Config{
-		Port: ":8080",
-		Users: []customtypes.User{
-			{
-				ID:    1,
-				Name:  "Aliaksei",
-				Email: "lashalo11409@gmail.com",
-				Phone: "+375 33 603 80 02",
-			},
-			{
-				ID:    2,
-				Name:  "David",
-				Email: "david@gmail.com",
-				Phone: "+375 11 222 33 44",
-			},
+	users := []customtypes.User{
+		{
+			ID:    1,
+			Name:  "Aliaksei",
+			Email: "lashalo11409@gmail.com",
+			Phone: "+375 33 603 80 02",
 		},
+		{
+			ID:    2,
+			Name:  "David",
+			Email: "david@gmail.com",
+			Phone: "+375 11 222 33 44",
+		},
+	}
+
+	config := Config{
+		Port:  ":8080",
+		Users: users,
 	}
 
 	return config

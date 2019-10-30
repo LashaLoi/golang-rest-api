@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -12,20 +11,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Info ...
-func Info(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Go to /api/users to use API")
+// Index ...
+func Index(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/api/users", http.StatusSeeOther)
 }
 
-// GetUsers ...
-func GetUsers(users *[]customtypes.User) http.HandlerFunc {
+// UsersGet ...
+func UsersGet(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(*users)
 	}
 }
 
-// CreateUser ...
-func CreateUser(users *[]customtypes.User) http.HandlerFunc {
+// UserCreate ...
+func UserCreate(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user customtypes.User
 
@@ -41,8 +40,8 @@ func CreateUser(users *[]customtypes.User) http.HandlerFunc {
 	}
 }
 
-// GetUser ...
-func GetUser(users *[]customtypes.User) http.HandlerFunc {
+// UserGet ...
+func UserGet(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 
@@ -68,8 +67,8 @@ func GetUser(users *[]customtypes.User) http.HandlerFunc {
 	}
 }
 
-// DeleteUser ...
-func DeleteUser(users *[]customtypes.User) http.HandlerFunc {
+// UserDelete ...
+func UserDelete(users *[]customtypes.User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 
